@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 10%; /* Dark Gray #1a1a1a */
+    --foreground: 0 0% 100%; /* White #ffffff */
+
+    --card: 0 0% 16%; /* Charcoal #2a2a2a */
+    --card-foreground: 0 0% 100%; /* White #ffffff */
+
+    --popover: 0 0% 16%; /* Charcoal #2a2a2a */
+    --popover-foreground: 0 0% 100%; /* White #ffffff */
+
+    --primary: 195 100% 46%; /* Cyber Blue #00b7eb */
+    --primary-foreground: 0 0% 100%; /* White #ffffff */
+
+    --secondary: 270 50% 68%; /* Purple #8884d8 */
+    --secondary-foreground: 0 0% 100%; /* White #ffffff */
+
+    --muted: 0 0% 20%; /* Slightly lighter than background */
+    --muted-foreground: 0 0% 70%; /* Light gray for muted text */
+
+    --accent: 120 100% 54%; /* Neon Green #39ff14 */
+    --accent-foreground: 0 0% 0%; /* Black for contrast */
+
+    --destructive: 0 100% 50%; /* Red #ff0000 */
+    --destructive-foreground: 0 0% 100%; /* White #ffffff */
+
+    --border: 0 0% 20%; /* Darker border */
+    --input: 0 0% 20%; /* Input background */
+    --ring: 195 100% 46%; /* Cyber Blue #00b7eb */
+
+    --radius: 0.5rem;
+
+    /* Chart colors */
+    --chart-1: 195 100% 46%; /* Cyber Blue */
+    --chart-2: 120 100% 54%; /* Neon Green */
+    --chart-3: 270 50% 68%; /* Purple */
+    --chart-4: 0 100% 50%; /* Red */
+  }
+
+  .dark {
+    --background: 0 0% 10%; /* Dark Gray #1a1a1a */
+    --foreground: 0 0% 100%; /* White #ffffff */
+
+    --card: 0 0% 16%; /* Charcoal #2a2a2a */
+    --card-foreground: 0 0% 100%; /* White #ffffff */
+
+    --popover: 0 0% 16%; /* Charcoal #2a2a2a */
+    --popover-foreground: 0 0% 100%; /* White #ffffff */
+
+    --primary: 195 100% 46%; /* Cyber Blue #00b7eb */
+    --primary-foreground: 0 0% 100%; /* White #ffffff */
+
+    --secondary: 270 50% 68%; /* Purple #8884d8 */
+    --secondary-foreground: 0 0% 100%; /* White #ffffff */
+
+    --muted: 0 0% 20%; /* Slightly lighter than background */
+    --muted-foreground: 0 0% 70%; /* Light gray for muted text */
+
+    --accent: 120 100% 54%; /* Neon Green #39ff14 */
+    --accent-foreground: 0 0% 0%; /* Black for contrast */
+
+    --destructive: 0 100% 50%; /* Red #ff0000 */
+    --destructive-foreground: 0 0% 100%; /* White #ffffff */
+
+    --border: 0 0% 20%; /* Darker border */
+    --input: 0 0% 20%; /* Input background */
+    --ring: 195 100% 46%; /* Cyber Blue #00b7eb */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom styles for the 3D background container */
+.three-d-container {
+  background-color: #1a1a1a;
+  border: 1px solid #1e3a8a;
+}
+
+/* Custom styles for charts */
+.recharts-default-tooltip {
+  background-color: #2a2a2a !important;
+  border: 1px solid #00b7eb !important;
+  color: #ffffff !important;
+}
+
+/* Custom color variables for charts */
+:root {
+  --color-before: #00b7eb;
+  --color-after: #39ff14;
+  --color-authorized: #39ff14;
+  --color-unauthorized: #ff0000;
+}
