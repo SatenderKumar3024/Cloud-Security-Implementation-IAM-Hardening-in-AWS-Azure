@@ -2,17 +2,34 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ModeToggle } from "@/components/mode-toggle"
-import { Button } from "@/components/ui/button"
-import { Menu, X, Shield, FileText } from "lucide-react"
+import { Menu, X, Shield } from "lucide-react"
+import { motion } from "framer-motion"
 
-export function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState("")
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
+      if (window.scrollY > 10) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+
+      const sections = ["about", "experience", "projects", "certifications", "contact", "resume"]
+
+      for (const section of sections) {
+        const element = document.getElementById(section)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(section)
+            break
+          }
+        }
+      }
     }
 
     window.addEventListener("scroll", handleScroll)
@@ -20,118 +37,190 @@ export function Navbar() {
   }, [])
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-md shadow-md" : "bg-transparent"
+    <motion.nav
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled ? "bg-blue-950/80 backdrop-blur-md py-2 shadow-lg" : "bg-transparent py-4"
       }`}
     >
-      <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Shield className="w-6 h-6 text-cyber-blue" />
-          <span className="font-bold text-lg">Satender Kumar</span>
-        </Link>
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex justify-between items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <Shield className="h-8 w-8 text-cyan-400" />
+            <span className="font-bold text-xl">Satender Kumar</span>
+          </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="#overview" className="text-sm font-medium hover:text-cyber-blue transition-colors">
-            Overview
-          </Link>
-          <Link href="#dashboard" className="text-sm font-medium hover:text-cyber-blue transition-colors">
-            Dashboard
-          </Link>
-          <Link href="#research" className="text-sm font-medium hover:text-cyber-blue transition-colors">
-            Research
-          </Link>
-          <Link href="#security" className="text-sm font-medium hover:text-cyber-blue transition-colors">
-            Security
-          </Link>
-          <Link href="#projects" className="text-sm font-medium hover:text-cyber-blue transition-colors">
-            Projects
-          </Link>
-          <Link href="#contact" className="text-sm font-medium hover:text-cyber-blue transition-colors">
-            Contact
-          </Link>
-        </nav>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              href="#about"
+              className={`transition-colors ${
+                activeSection === "about" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              }`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              About
+            </Link>
+            <Link
+              href="#experience"
+              className={`transition-colors ${
+                activeSection === "experience" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              }`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              Experience
+            </Link>
+            <Link
+              href="#projects"
+              className={`transition-colors ${
+                activeSection === "projects" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              }`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              Projects
+            </Link>
+            <Link
+              href="#certifications"
+              className={`transition-colors ${
+                activeSection === "certifications" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              }`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("certifications")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              Certifications
+            </Link>
+            <Link
+              href="#contact"
+              className={`transition-colors ${
+                activeSection === "contact" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              }`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              Contact
+            </Link>
+            <Link
+              href="#resume"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 rounded-md font-medium hover:from-cyan-600 hover:to-blue-600 transition-all"
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("resume")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              Resume
+            </Link>
+          </div>
 
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          <Button variant="outline" size="sm" className="hidden md:flex gap-2">
-            <FileText className="w-4 h-4" />
-            <span>Resume</span>
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(true)}>
-            <Menu className="w-5 h-5" />
-          </Button>
+          {/* Mobile Navigation Toggle */}
+          <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm md:hidden">
-          <div className="container flex flex-col h-full p-6">
-            <div className="flex items-center justify-between mb-8">
-              <Link href="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
-                <Shield className="w-6 h-6 text-cyber-blue" />
-                <span className="font-bold text-lg">Satender Kumar</span>
-              </Link>
-              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-
-            <nav className="flex flex-col gap-6 text-center">
-              <Link
-                href="#overview"
-                className="text-lg font-medium py-2 hover:text-cyber-blue transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Overview
-              </Link>
-              <Link
-                href="#dashboard"
-                className="text-lg font-medium py-2 hover:text-cyber-blue transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="#research"
-                className="text-lg font-medium py-2 hover:text-cyber-blue transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Research
-              </Link>
-              <Link
-                href="#security"
-                className="text-lg font-medium py-2 hover:text-cyber-blue transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Security
-              </Link>
-              <Link
-                href="#projects"
-                className="text-lg font-medium py-2 hover:text-cyber-blue transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Projects
-              </Link>
-              <Link
-                href="#contact"
-                className="text-lg font-medium py-2 hover:text-cyber-blue transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact
-              </Link>
-            </nav>
-
-            <div className="mt-auto flex justify-center">
-              <Button className="w-full max-w-xs gap-2">
-                <FileText className="w-4 h-4" />
-                <span>Download Resume</span>
-              </Button>
-            </div>
+      {/* Mobile Navigation Menu */}
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="md:hidden bg-blue-900/90 backdrop-blur-md"
+        >
+          <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+            <Link
+              href="#about"
+              className={`transition-colors ${
+                activeSection === "about" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              } py-2`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })
+                setIsOpen(false)
+              }}
+            >
+              About
+            </Link>
+            <Link
+              href="#experience"
+              className={`transition-colors ${
+                activeSection === "experience" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              } py-2`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" })
+                setIsOpen(false)
+              }}
+            >
+              Experience
+            </Link>
+            <Link
+              href="#projects"
+              className={`transition-colors ${
+                activeSection === "projects" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              } py-2`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })
+                setIsOpen(false)
+              }}
+            >
+              Projects
+            </Link>
+            <Link
+              href="#certifications"
+              className={`transition-colors ${
+                activeSection === "certifications" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              } py-2`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("certifications")?.scrollIntoView({ behavior: "smooth" })
+                setIsOpen(false)
+              }}
+            >
+              Certifications
+            </Link>
+            <Link
+              href="#contact"
+              className={`transition-colors ${
+                activeSection === "contact" ? "text-white font-medium" : "text-gray-300 hover:text-white"
+              } py-2`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+                setIsOpen(false)
+              }}
+            >
+              Contact
+            </Link>
+            <Link
+              href="#resume"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 rounded-md font-medium hover:from-cyan-600 hover:to-blue-600 transition-all inline-block"
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById("resume")?.scrollIntoView({ behavior: "smooth" })
+                setIsOpen(false)
+              }}
+            >
+              Resume
+            </Link>
           </div>
-        </div>
+        </motion.div>
       )}
-    </header>
+    </motion.nav>
   )
 }

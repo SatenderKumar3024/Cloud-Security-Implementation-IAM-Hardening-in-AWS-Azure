@@ -2,281 +2,153 @@
 
 import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { BarChart, LineChart, PieChart } from "recharts"
-import { Bar, Line, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts"
-import { Shield, AlertTriangle, CheckCircle, Clock, Activity } from "lucide-react"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { CheckCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-// Sample data for the charts
 const vulnerabilityData = [
-  { name: "Identity", before: 85, after: 35 },
-  { name: "Access Control", before: 92, after: 42 },
-  { name: "Authentication", before: 78, after: 30 },
-  { name: "Authorization", before: 88, after: 38 },
-  { name: "Privilege Escalation", before: 95, after: 45 },
-]
-
-const bucketAccessData = [
-  { name: "Bucket 1", authorized: 120, unauthorized: 5 },
-  { name: "Bucket 2", authorized: 98, unauthorized: 2 },
-  { name: "Bucket 3", authorized: 86, unauthorized: 0 },
-  { name: "Bucket 4", authorized: 99, unauthorized: 3 },
-  { name: "Bucket 5", authorized: 85, unauthorized: 1 },
+  { name: "Critical", value: 5, color: "#ef4444" },
+  { name: "High", value: 15, color: "#f97316" },
+  { name: "Medium", value: 30, color: "#eab308" },
+  { name: "Low", value: 50, color: "#22c55e" },
 ]
 
 const complianceData = [
-  { name: "Compliant", value: 85 },
-  { name: "Non-Compliant", value: 10 },
-  { name: "In Progress", value: 5 },
+  { name: "NIST 800-53", status: "Compliant", icon: CheckCircle },
+  { name: "GDPR", status: "Compliant", icon: CheckCircle },
+  { name: "ISO 27001", status: "Compliant", icon: CheckCircle },
 ]
 
-const COLORS = ["#00cc88", "#ff4444", "#f5a623"]
-
-const logEntries = [
-  {
-    time: "10:45:23",
-    user: "admin@example.com",
-    action: "Policy Update",
-    resource: "S3 Bucket: data-archive",
-    status: "Success",
-  },
-  {
-    time: "10:32:17",
-    user: "service-account@example.com",
-    action: "Read Access",
-    resource: "VM: app-server-01",
-    status: "Success",
-  },
-  {
-    time: "10:28:05",
-    user: "john.doe@example.com",
-    action: "Write Access",
-    resource: "S3 Bucket: user-uploads",
-    status: "Denied",
-  },
-  {
-    time: "10:15:42",
-    user: "system@example.com",
-    action: "Configuration Change",
-    resource: "IAM Role: ReadOnlyAccess",
-    status: "Success",
-  },
-  {
-    time: "10:02:19",
-    user: "jane.smith@example.com",
-    action: "Delete Operation",
-    resource: "Azure Blob: backup-2023",
-    status: "Denied",
-  },
-]
-
-export function Dashboard() {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, amount: 0.1 })
+export default function Dashboard() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: false, amount: 0.2 })
 
   return (
-    <section id="dashboard" className="py-20 bg-background/50 relative">
-      <div className="container px-4 md:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">Security Dashboard</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Real-time visualization of security metrics and IAM implementation results.
+    <section className="py-20 relative overflow-hidden" id="dashboard">
+      {/* Background Elements */}
+      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          ref={ref}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-blue-300">
+            Interactive Dashboard
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Real-time metrics showing the impact of IAM hardening across cloud environments
           </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-blue-950/50 backdrop-blur-sm border border-blue-500/20 rounded-xl p-6"
+          >
+            <h3 className="text-xl font-semibold mb-4 text-white">Vulnerability Reduction</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={vulnerabilityData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {vulnerabilityData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 text-center">
+              <div className="inline-block bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 rounded-full text-white font-medium">
+                30% Overall Vulnerability Reduction
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="bg-blue-950/50 backdrop-blur-sm border border-blue-500/20 rounded-xl p-6"
+          >
+            <h3 className="text-xl font-semibold mb-4 text-white">IAM Role Matrix</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-blue-800">
+                    <th className="py-3 px-4 text-left text-cyan-300">Role</th>
+                    <th className="py-3 px-4 text-left text-cyan-300">Resources</th>
+                    <th className="py-3 px-4 text-left text-cyan-300">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-blue-800/50">
+                    <td className="py-3 px-4">Admin</td>
+                    <td className="py-3 px-4">Limited to critical infrastructure</td>
+                    <td className="py-3 px-4 text-green-400">Optimized</td>
+                  </tr>
+                  <tr className="border-b border-blue-800/50">
+                    <td className="py-3 px-4">Developer</td>
+                    <td className="py-3 px-4">Dev/Test environments only</td>
+                    <td className="py-3 px-4 text-green-400">Optimized</td>
+                  </tr>
+                  <tr className="border-b border-blue-800/50">
+                    <td className="py-3 px-4">Security</td>
+                    <td className="py-3 px-4">Read-only across all resources</td>
+                    <td className="py-3 px-4 text-green-400">Optimized</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4">Service Account</td>
+                    <td className="py-3 px-4">Function-specific access</td>
+                    <td className="py-3 px-4 text-green-400">Optimized</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 text-center">
+              <Button variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-950/30">
+                View Full Matrix
+              </Button>
+            </div>
+          </motion.div>
         </div>
 
         <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          <Tabs defaultValue="vulnerabilities" className="w-full">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-8">
-              <TabsTrigger value="vulnerabilities" className="gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                <span>Vulnerabilities</span>
-              </TabsTrigger>
-              <TabsTrigger value="access" className="gap-2">
-                <Shield className="w-4 h-4" />
-                <span>Access Control</span>
-              </TabsTrigger>
-              <TabsTrigger value="compliance" className="gap-2">
-                <CheckCircle className="w-4 h-4" />
-                <span>Compliance</span>
-              </TabsTrigger>
-              <TabsTrigger value="logs" className="gap-2">
-                <Activity className="w-4 h-4" />
-                <span>Audit Logs</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="vulnerabilities">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Vulnerability Reduction</CardTitle>
-                  <CardDescription>
-                    Comparison of vulnerabilities before and after IAM hardening implementation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px]">
-                    <ChartContainer
-                      config={{
-                        before: {
-                          label: "Before Implementation",
-                          color: "hsl(var(--chart-1))",
-                        },
-                        after: {
-                          label: "After Implementation",
-                          color: "hsl(var(--chart-2))",
-                        },
-                      }}
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={vulnerabilityData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                          <Legend />
-                          <Bar dataKey="before" fill="var(--color-before)" name="Before Implementation" />
-                          <Bar dataKey="after" fill="var(--color-after)" name="After Implementation" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="access">
-              <Card>
-                <CardHeader>
-                  <CardTitle>S3 Bucket & VM Access Control</CardTitle>
-                  <CardDescription>Authorized vs. unauthorized access attempts</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px]">
-                    <ChartContainer
-                      config={{
-                        authorized: {
-                          label: "Authorized Access",
-                          color: "hsl(var(--chart-3))",
-                        },
-                        unauthorized: {
-                          label: "Unauthorized Attempts",
-                          color: "hsl(var(--chart-4))",
-                        },
-                      }}
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={bucketAccessData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                          <Legend />
-                          <Line
-                            type="monotone"
-                            dataKey="authorized"
-                            stroke="var(--color-authorized)"
-                            name="Authorized Access"
-                            strokeWidth={2}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="unauthorized"
-                            stroke="var(--color-unauthorized)"
-                            name="Unauthorized Attempts"
-                            strokeWidth={2}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="compliance">
-              <Card>
-                <CardHeader>
-                  <CardTitle>NIST 800-53 Compliance Status</CardTitle>
-                  <CardDescription>Current compliance status with NIST 800-53 access control policies</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[400px] flex items-center justify-center">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={complianceData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={150}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {complianceData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="logs">
-              <Card>
-                <CardHeader>
-                  <CardTitle>IAM Audit Logs</CardTitle>
-                  <CardDescription>Recent IAM activity and access attempts</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="border rounded-md">
-                    <div className="grid grid-cols-5 gap-4 p-4 font-medium border-b">
-                      <div>Time</div>
-                      <div>User</div>
-                      <div>Action</div>
-                      <div>Resource</div>
-                      <div>Status</div>
-                    </div>
-                    <div className="divide-y">
-                      {logEntries.map((entry, index) => (
-                        <div key={index} className="grid grid-cols-5 gap-4 p-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-muted-foreground" />
-                            {entry.time}
-                          </div>
-                          <div>{entry.user}</div>
-                          <div>{entry.action}</div>
-                          <div className="font-mono text-xs">{entry.resource}</div>
-                          <div>
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                entry.status === "Success"
-                                  ? "bg-cyber-green/10 text-cyber-green"
-                                  : "bg-cyber-red/10 text-cyber-red"
-                              }`}
-                            >
-                              {entry.status}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          {complianceData.map((item, index) => (
+            <div
+              key={index}
+              className="bg-blue-950/30 backdrop-blur-sm border border-blue-500/20 rounded-xl p-6 flex items-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mr-4">
+                <item.icon className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                <h4 className="font-medium text-white">{item.name}</h4>
+                <p className="text-green-400">{item.status}</p>
+              </div>
+            </div>
+          ))}
         </motion.div>
       </div>
     </section>

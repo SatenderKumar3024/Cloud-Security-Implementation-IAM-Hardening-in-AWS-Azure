@@ -1,191 +1,192 @@
 "use client"
 
-import { useRef, useEffect } from "react"
-import { motion, useScroll, useTransform, useAnimation } from "framer-motion"
+import { useRef } from "react"
+import { motion } from "framer-motion"
+import { Canvas, useFrame } from "@react-three/fiber"
+import { Float, Environment, Text, Html } from "@react-three/drei"
+import { Shield, Lock, Cloud, Database } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ArrowDown, Shield, Lock, FileText, Database, Server } from "lucide-react"
-import { FingerprintAnimation } from "@/components/fingerprint-animation"
-import { TypingTagline } from "@/components/typing-tagline"
 
-export function Hero() {
-  const ref = useRef<HTMLDivElement>(null)
-  const controls = useAnimation()
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
+function ShieldModel({ position = [0, 0, 0], rotation = [0, 0, 0] }) {
+  const group = useRef()
+
+  useFrame((state) => {
+    if (group.current) {
+      group.current.rotation.y = state.clock.getElapsedTime() * 0.2
+    }
   })
 
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, 100])
+  return (
+    <group ref={group} position={position} rotation={rotation}>
+      <mesh>
+        <boxGeometry args={[1, 1.5, 0.1]} />
+        <meshStandardMaterial color="#3b82f6" metalness={0.8} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, 0, 0.06]}>
+        <Html transform>
+          <div className="text-cyan-400">
+            <Lock size={24} />
+          </div>
+        </Html>
+      </mesh>
+    </group>
+  )
+}
 
-  useEffect(() => {
-    controls.start({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, delay: 0.2 },
-    })
-  }, [controls])
+function CloudNode({ position = [0, 0, 0] }) {
+  const ref = useRef()
+
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.getElapsedTime() * 0.1
+      ref.current.position.y = position[1] + Math.sin(state.clock.getElapsedTime()) * 0.1
+    }
+  })
 
   return (
-    <div ref={ref} className="relative overflow-hidden">
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-cyber-dark z-0"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-cyber-blue/5 via-transparent to-cyber-purple/5 z-0"></div>
-
-      <motion.div className="relative z-10 px-4 md:px-6" style={{ opacity, y }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyber-blue/20 to-cyber-purple/20 text-cyber-blue mb-6 backdrop-blur-sm border border-cyber-blue/10"
-          >
-            <Lock className="w-4 h-4" />
-            <span className="text-sm font-medium">Cloud Security Implementation</span>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-lg md:text-xl text-white mb-8 leading-relaxed"
-          >
-            A comprehensive approach to implementing least-privilege access principles, reducing vulnerabilities by 30%,
-            and aligning with NIST 800-53 access control policies.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Button
-              size="lg"
-              className="gap-2 bg-gradient-to-r from-cyber-blue to-cyber-purple hover:from-cyber-blue/90 hover:to-cyber-purple/90 transition-all duration-300 shadow-lg hover:shadow-cyber-blue/20"
-            >
-              <Shield className="w-4 h-4" />
-              <span>View Project</span>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="gap-2 border-cyber-blue/30 hover:border-cyber-blue/60 transition-all duration-300"
-            >
-              <FileText className="w-4 h-4" />
-              <span>Download Report</span>
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 1 }}
-            className="mt-12 flex justify-center"
-          >
-            <div className="w-24 h-24">
-              <FingerprintAnimation />
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+      <group ref={ref} position={position}>
+        <mesh>
+          <sphereGeometry args={[0.5, 16, 16]} />
+          <meshStandardMaterial color="#8b5cf6" metalness={0.5} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0, 0.5]}>
+          <Html transform>
+            <div className="text-white">
+              <Cloud size={16} />
             </div>
-          </motion.div>
+          </Html>
+        </mesh>
+      </group>
+    </Float>
+  )
+}
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-6 text-xl font-medium"
-          >
-            <TypingTagline
-              phrases={[
-                "Information Security Analyst",
-                "Cloud Security Expert",
-                "IAM Implementation Specialist",
-                "AWS & Azure Security Professional",
-              ]}
-            />
-          </motion.div>
-        </div>
-      </motion.div>
+function Scene() {
+  return (
+    <>
+      <Environment preset="night" />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full animate-bounce bg-cyber-blue/10 hover:bg-cyber-blue/20 text-cyber-blue"
+      <ShieldModel position={[0, 0, -2]} />
+
+      <CloudNode position={[-3, 1, -3]} />
+      <CloudNode position={[3, -1, -4]} />
+      <CloudNode position={[2, 2, -5]} />
+      <CloudNode position={[-2, -2, -6]} />
+
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.2}>
+        <Text
+          position={[0, 2, -3]}
+          fontSize={0.5}
+          color="#60a5fa"
+          anchorX="center"
+          anchorY="middle"
+          font="/fonts/Inter_Bold.json"
         >
-          <ArrowDown className="w-5 h-5" />
-        </Button>
-      </motion.div>
+          SECURE
+        </Text>
+      </Float>
+    </>
+  )
+}
 
-      {/* Floating icons */}
-      <motion.div
-        className="absolute top-1/4 left-[10%] text-cyber-blue/30 hidden lg:block"
-        animate={{
-          y: [0, -10, 0],
-          rotate: [0, 5, 0],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Number.POSITIVE_INFINITY,
-          repeatType: "reverse",
-        }}
-      >
-        <Shield size={40} />
-      </motion.div>
+export default function Hero() {
+  return (
+    <section className="relative h-screen flex items-center justify-center overflow-hidden" id="hero">
+      <div className="absolute inset-0 z-10">
+        <Canvas className="w-full h-full">
+          <Scene />
+        </Canvas>
+      </div>
 
-      <motion.div
-        className="absolute bottom-1/4 right-[15%] text-cyber-purple/30 hidden lg:block"
-        animate={{
-          y: [0, 10, 0],
-          rotate: [0, -5, 0],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Number.POSITIVE_INFINITY,
-          repeatType: "reverse",
-          delay: 0.5,
-        }}
-      >
-        <Lock size={40} />
-      </motion.div>
+      <div className="container mx-auto px-4 md:px-6 z-20 relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="max-w-4xl mx-auto text-center"
+        >
+          <div className="inline-block mb-4">
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-1 rounded-full text-sm font-medium">
+              CASE STUDY
+            </span>
+          </div>
 
-      <motion.div
-        className="absolute top-1/3 right-[10%] text-cyber-cyan/30 hidden lg:block"
-        animate={{
-          y: [0, -15, 0],
-          rotate: [0, 10, 0],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Number.POSITIVE_INFINITY,
-          repeatType: "reverse",
-          delay: 1,
-        }}
-      >
-        <Database size={40} />
-      </motion.div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300">
+            Cloud Security Implementation
+          </h1>
 
-      <motion.div
-        className="absolute bottom-1/3 left-[15%] text-cyber-green/30 hidden lg:block"
-        animate={{
-          y: [0, 15, 0],
-          rotate: [0, -10, 0],
-        }}
-        transition={{
-          duration: 5.5,
-          repeat: Number.POSITIVE_INFINITY,
-          repeatType: "reverse",
-          delay: 1.5,
-        }}
-      >
-        <Server size={40} />
-      </motion.div>
+          <p className="text-xl md:text-2xl text-gray-300 mb-8">
+            IAM policies optimized across AWS & Azure — Reduced vulnerabilities by 30% (Qualys scans), aligned with NIST
+            800-53
+          </p>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cyber-dark to-transparent z-10" />
-    </div>
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-blue-900/30 backdrop-blur-sm border border-blue-500/30 rounded-lg px-4 py-3 flex items-center"
+            >
+              <Shield className="h-5 w-5 text-cyan-400 mr-2" />
+              <span>AWS</span>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-blue-900/30 backdrop-blur-sm border border-blue-500/30 rounded-lg px-4 py-3 flex items-center"
+            >
+              <Cloud className="h-5 w-5 text-cyan-400 mr-2" />
+              <span>Azure</span>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-blue-900/30 backdrop-blur-sm border border-blue-500/30 rounded-lg px-4 py-3 flex items-center"
+            >
+              <Lock className="h-5 w-5 text-cyan-400 mr-2" />
+              <span>IAM</span>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-blue-900/30 backdrop-blur-sm border border-blue-500/30 rounded-lg px-4 py-3 flex items-center"
+            >
+              <Database className="h-5 w-5 text-cyan-400 mr-2" />
+              <span>NIST 800-53</span>
+            </motion.div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button
+              variant="default"
+              size="lg"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white"
+            >
+              View Live Architecture
+            </Button>
+
+            <Button variant="outline" size="lg" className="border-cyan-500 text-cyan-400 hover:bg-cyan-950/30">
+              Request Resume
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+          className="text-gray-400 text-sm"
+        >
+          Scroll to explore
+        </motion.div>
+      </div>
+    </section>
   )
 }
